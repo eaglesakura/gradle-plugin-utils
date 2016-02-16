@@ -89,6 +89,15 @@ uploadArchives {
     }
 }
 
+task uploadGroovydoc << {
+    def src = file("build/docs/groovydoc/");
+    def dst = new File("${ARTIFACT_INSTALL_TARGET.absolutePath}/doc/${ARTIFACT_NAME}/");
+    dst.deleteDir();
+    dst.mkdirs();
+
+    ["/usr/bin/rsync", "-a", src.absolutePath, dst.absolutePath].execute().text;
+}
+
 /**
  * バージョンを取得する
  * CircleCIの場合、バージョン末尾にビルド番号を付与する
