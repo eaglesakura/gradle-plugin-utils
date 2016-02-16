@@ -1,5 +1,3 @@
-import org.codehaus.groovy.groovydoc.GroovyDoc
-
 /**
  * 1.0.0  : release
  * 1.0.x  : Circle CIに移行
