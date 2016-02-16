@@ -1,34 +1,71 @@
+import org.codehaus.groovy.groovydoc.GroovyDoc
+
+/**
+ * 1.0.0  : release
+ * 1.0.x  : Circle CIに移行
+ */
+def ARTIFACT_VERSION = "1.0"
+def ARTIFACT_NAME = file(".").absoluteFile.name
+def ARTIFACT_INSTALL_TARGET = getArtifactInstallTarget()
 apply plugin: 'groovy'
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
-repositories {
-    mavenCentral()
-    maven { url "http://eaglesakura.github.io/maven/" }
+// Local or maven
+if (!hasProperty("EGLIBRARY_COMPILE_LOCAL")) {
+    ext.EGLIBRARY_COMPILE_LOCAL = false
 }
 
+repositories {
+    maven { url "http://eaglesakura.github.io/maven/" }
+    mavenCentral()
+}
+
+configurations {
+    groovyDoc
+}
 
 dependencies {
     // build groovy
-//    groovy "org.codehaus.groovy:groovy:2.0.+"
     compile gradleApi()
-//    groovy localGroovy()
+    groovyDoc 'org.codehaus.groovy:groovy-groovydoc:2.3.3'
+    groovyDoc 'org.codehaus.groovy:groovy-ant:2.3.3'
 
-    compile "com.eaglesakura:simple-logger:+"
+    if (EGLIBRARY_COMPILE_LOCAL) {
+        compile project(':eglibrary:simple-logger')
+        compile project(':eglibrary:simple-utils')
+    } else {
+        compile 'com.eaglesakura:simple-logger:1.+'
+        compile 'com.eaglesakura:simple-utils:1.+'
+    }
 }
 
 apply plugin: 'maven'
 
-if (!hasProperty("EGLIBRARY_ARTIFACT_VERSION")) {
-    ext.EGLIBRARY_ARTIFACT_VERSION = ""
+groovydoc {
+    groovyClasspath = configurations.groovyDoc
+}
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task groovydocJar(type: Jar, dependsOn: groovydoc) {
+    classifier = 'javadoc'
+    from "${buildDir}/docs/groovydoc"
+}
+
+artifacts {
+    archives sourcesJar
+    archives groovydocJar
 }
 
 uploadArchives {
     repositories {
         mavenDeployer {
-            repository(url: uri(new File("${System.env.MAVEN_LOCAL_REPO}")))
-            pom.version = EGLIBRARY_ARTIFACT_VERSION
+            repository(url: uri(ARTIFACT_INSTALL_TARGET))
+            pom.version = ARTIFACT_VERSION + getArtifactVersionSuffix()
             pom.groupId = "com.eaglesakura"
             pom.artifactId = file(".").absoluteFile.name;
         }
@@ -37,7 +74,7 @@ uploadArchives {
 
 [uploadArchives.repositories.mavenDeployer]*.pom*.whenConfigured { pom ->
     pom.project {
-        inceptionYear '2014'
+        inceptionYear '2016'
         packaging 'jar'
         licenses {
             license {
@@ -49,14 +86,33 @@ uploadArchives {
                 url 'https://raw.githubusercontent.com/eaglesakura/eglibrary/master/LICENSE-MIT.txt'
             }
         }
+    }
+}
 
-        dependencies {
-            dependency {
-                groupId = 'com.eaglesakura'
-                artifactId = 'eglibrary-java-wrapper'
-                version = EGLIBRARY_ARTIFACT_VERSION
-                scope = 'compile'
-            }
-        }
+/**
+ * バージョンを取得する
+ * CircleCIの場合、バージョン末尾にビルド番号を付与する
+ */
+def getArtifactVersionSuffix() {
+    if (System.env.CIRCLE_BUILD_NUM != null) {
+        // CircleCIのバージョンが指定されているので、そちらを利用する
+        return ".${System.env.CIRCLE_BUILD_NUM}"
+    } else {
+        return ".local"
+    }
+}
+
+/**
+ * Mavenの格納先を確定する
+ */
+def getArtifactInstallTarget() {
+    if (file("maven").directory) {
+        return file("maven");
+    } else if (System.env.CIRCLE_ARTIFACTS != null) {
+        return file(System.env.CIRCLE_ARTIFACTS);
+    } else if (System.env.MAVEN_LOCAL_REPO != null) {
+        return file(System.env.MAVEN_LOCAL_REPO);
+    } else {
+        return file("ci-release");
     }
 }

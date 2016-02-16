@@ -1,7 +1,7 @@
 package com.eaglesakura.tool.generator
 
-import com.eaglesakura.io.IOUtil
 import com.eaglesakura.tool.log.Logger
+import com.eaglesakura.util.IOUtil
 
 /**
  * コード出力を行う
