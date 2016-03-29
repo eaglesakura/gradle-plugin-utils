@@ -24,8 +24,8 @@ deployment:
   canary:
     branch: /^v[0-9]\..*$/
     commands:
-    - sh -c "$(curl -fsSL https://raw.githubusercontent.com/eaglesakura/build-dependencies/master/circleci/build-deploy-maven.sh)"
+    - sh -c "$(curl -fsSL https://raw.githubusercontent.com/eaglesakura/build-dependencies/master/circleci/build-deploy-groovy-maven.sh)"
   develop:
     branch: develop
     commands:
-    - sh -c "$(curl -fsSL https://raw.githubusercontent.com/eaglesakura/build-dependencies/master/circleci/build-deploy-local.sh)"
+    - sh -c "$(curl -fsSL https://raw.githubusercontent.com/eaglesakura/build-dependencies/master/circleci/build-deploy-groovy-local.sh)"
