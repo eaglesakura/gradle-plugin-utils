@@ -1,7 +1,4 @@
 package com.eaglesakura.tool.log
-
-import com.eaglesakura.util.LogUtil;
-
 /**
  * ログ出力管理クラス
  */
@@ -12,19 +9,6 @@ public class Logger {
     static int outLogLevel = 4;
 
     private static String indentText = "";
-
-    static {
-        // ログ出力を迂回
-        LogUtil.setLogger(new LogUtil.Logger() {
-            public void i(String msg) {
-                Logger.out(msg);
-            }
-
-            public void d(String msg) {
-                Logger.out(msg);
-            }
-        });
-    }
 
     /**
      * このメソッドは現在何も行わない

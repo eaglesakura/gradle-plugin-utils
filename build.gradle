@@ -1,5 +1,3 @@
-import org.codehaus.groovy.groovydoc.GroovyDoc
-
 /**
  * 1.0.0  : release
  * 1.0.x  : Circle CIに移行
@@ -33,12 +31,13 @@ dependencies {
     groovyDoc 'org.codehaus.groovy:groovy-ant:2.3.3'
 
     if (EGLIBRARY_COMPILE_LOCAL) {
-        compile project(':eglibrary:simple-logger')
         compile project(':eglibrary:simple-utils')
     } else {
-        compile 'com.eaglesakura:simple-logger:1.+'
-        compile 'com.eaglesakura:simple-utils:1.+'
+        compile 'com.eaglesakura:simple-utils:1.1.+'
     }
+
+    // UnitTest
+    testCompile 'junit:junit:4.12'
 }
 
 apply plugin: 'maven'
