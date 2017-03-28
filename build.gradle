@@ -49,7 +49,7 @@ dependencies {
     if (EGLIBRARY_COMPILE_LOCAL) {
         compile project(':eglibrary:simple-utils')
     } else {
-        compile 'com.eaglesakura:simple-utils:1.1.+'
+        compile 'com.eaglesakura:simple-utils:1.2.562'
     }
 
     // UnitTest
