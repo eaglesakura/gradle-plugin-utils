@@ -8,113 +8,113 @@ import com.eaglesakura.util.IOUtil
  *
  * 一旦一時ファイルへ出力し、commitされた時点で最新版に更新する
  */
-public class CodeWriter {
-    int indent = 0;
+class CodeWriter {
+    int indent = 0
 
     /**
      * 1インデントで出力するスペース数
      */
-    int indentSpaces = 4;
+    int indentSpaces = 4
 
     /**
      * 最終出力ファイル
      */
-    File outFile;
+    File outFile
 
     /**
      * 一時出力ファイル
      */
-    File tempFile;
+    File tempFile
 
-    public CodeWriter(File file) {
-        this.outFile = file.absoluteFile;
-        this.tempFile = new File(file.absolutePath + ".txt");
+    CodeWriter(File file) {
+        this.outFile = file.absoluteFile
+        this.tempFile = new File(file.absolutePath + ".txt")
 
         // 経路確保
-        this.outFile.parentFile.mkdirs();
-        tempFile.delete();
+        this.outFile.parentFile.mkdirs()
+        tempFile.delete()
     }
 
     /**
      * 文字を書き込む
      * @param text
      */
-    public CodeWriter write(String text) {
-        tempFile.append(text);
-        return this;
+    CodeWriter write(String text) {
+        tempFile.append(text)
+        return this
     }
 
     /**
      * 文字を書き込み、改行する
      * @param text
      */
-    public CodeWriter writeLine(String text) {
-        tempFile.append(text);
-        return newLine();
+    CodeWriter writeLine(String text) {
+        tempFile.append(text)
+        return newLine()
     }
 
     /**
      * 改行を行う
      * @return
      */
-    public CodeWriter newLine() {
-        String temp = "\n";
+    CodeWriter newLine() {
+        String temp = "\n"
         for (int i = 0; i < (indentSpaces * indent); ++i) {
-            temp += " ";
+            temp += " "
         }
-        return write(temp);
+        return write(temp)
     }
 
     /**
      * インデントを追加する
      */
-    public CodeWriter pushIndent(boolean writeIndent) {
-        ++indent;
+    CodeWriter pushIndent(boolean writeIndent) {
+        ++indent
         if (writeIndent) {
-            String temp = "";
+            String temp = ""
             for (int i = 0; i < (indentSpaces * indent); ++i) {
-                temp += " ";
+                temp += " "
             }
-            write(temp);
+            write(temp)
         }
-        return this;
+        return this
     }
 
     /**
      * インデントを減らす
      * @return
      */
-    public CodeWriter popIndent(boolean withNewLine) {
-        --indent;
+    CodeWriter popIndent(boolean withNewLine) {
+        --indent
         if (withNewLine) {
-            return newLine();
+            return newLine()
         }
-        return this;
+        return this
     }
 
     /**
      * 最終コミットを行う
      */
-    public void commit() {
+    void commit() {
         if (!outFile.isFile()) {
             // まだファイルがないからすぐコミットできる
-            tempFile.renameTo(outFile);
-            return;
+            tempFile.renameTo(outFile)
+            return
         }
 
         // 上書きチェックを行う
-        String oldSha1 = IOUtil.genSHA1(outFile);
-        String newSha1 = IOUtil.genSHA1(tempFile);
+        String oldSha1 = IOUtil.genSHA1(outFile)
+        String newSha1 = IOUtil.genSHA1(tempFile)
 
         if (!oldSha1.equals(newSha1)) {
             // 差分があるため上書きする
-            outFile.delete();
-            tempFile.renameTo(outFile);
+            outFile.delete()
+            tempFile.renameTo(outFile)
             Logger.out("[${tempFile.name}] commit -> [${outFile.name}]")
         } else {
             // 一致するため、tempは不要となる
             Logger.out("[${tempFile.name}] equals [${outFile.name}]")
-            tempFile.delete();
+            tempFile.delete()
         }
     }
 }

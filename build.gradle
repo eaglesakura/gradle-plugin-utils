@@ -45,14 +45,8 @@ dependencies {
     compile gradleApi()
     groovyDoc 'org.codehaus.groovy:groovy-groovydoc:2.3.3'
     groovyDoc 'org.codehaus.groovy:groovy-ant:2.3.3'
-
-    if (EGLIBRARY_COMPILE_LOCAL) {
-        compile project(':eglibrary:simple-utils')
-    } else {
-        compile 'com.eaglesakura:simple-utils:1.2.562'
-    }
-
     // UnitTest
+    compile 'com.eaglesakura:java-commons:2.0.3'
     testCompile 'junit:junit:4.12'
 }
 
